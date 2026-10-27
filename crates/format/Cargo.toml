@@ -1,0 +1,25 @@
+[package]
+name = "filmstar-format"
+description = "FilmStar .fcproj files: schema versions + migrations, atomic saves, auto-save naming and rotation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+filmstar-project = { workspace = true }
+filmstar-media = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tempfile = "3.27"
+
+[dev-dependencies]
+filmstar-time = { workspace = true }

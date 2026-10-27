@@ -1,0 +1,12 @@
+FilmStar app icon (make_icon.py, filmstar.svg, filmstar-small.svg and every file derived from them in
+this directory: filmstar-1024.png, filmstar-macos-512.png, filmstar.icns, filmstar.ico, hicolor/, and
+apps/filmstar-web/web/favicon.png).
+
+Original artwork drawn as code (make_icon.py) by an AI assistant (Claude) for the FilmStar fork:
+an engraving-style cinema camera. Replaces the earlier owl icon of FilmCraft. No third-party material.
+Licensed like the rest of FilmStar, under either of
+
+  * Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+  * MIT license (https://opensource.org/licenses/MIT)
+
+at your option.

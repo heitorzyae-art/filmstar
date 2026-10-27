@@ -1,0 +1,11 @@
+kind = "app"
+categories = ["AudioVideo", "Video", "AudioVideoEditing"]
+icon = "assets/app-icon/hicolor/256x256/apps/ai.storyteller.filmstar.png"
+
+[linux.x86_64]
+asset = "filmstar-{version}-linux-x86_64.tar.gz"
+exec = "filmstar-{version}-linux-x86_64/bin/filmstar"
+
+[linux.aarch64]
+asset = "filmstar-{version}-linux-aarch64.tar.gz"
+exec = "filmstar-{version}-linux-aarch64/bin/filmstar"

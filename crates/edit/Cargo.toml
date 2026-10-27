@@ -1,0 +1,21 @@
+[package]
+name = "filmstar-edit"
+description = "Pure timeline edit algebra: insert, overwrite, razor, ripple, roll, slip, slide, rate stretch, lift, extract"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+filmstar-time = { workspace = true }
+filmstar-project = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+filmstar-geom = { workspace = true }
+filmstar-media = { workspace = true }
+serde_json = { workspace = true }

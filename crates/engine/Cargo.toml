@@ -1,0 +1,53 @@
+[package]
+name = "filmstar-engine"
+description = "FilmStar engine façade: session, command registry, history, media pool"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# Speech-to-text with Whisper (candle, CPU). Off by default and in wasm builds.
+whisper = ["filmstar-speech/whisper"]
+# Speech-model downloads over HTTPS.
+speech-download = ["filmstar-speech/download"]
+# Natural voices for Text to Speech: Kokoro-82M on candle (CPU) and their download.
+neural-voices = ["filmstar-tts/kokoro", "speech-download"]
+
+[dependencies]
+filmstar-time = { workspace = true }
+filmstar-geom = { workspace = true }
+filmstar-color = { workspace = true }
+filmstar-frame = { workspace = true }
+filmstar-media = { workspace = true }
+filmstar-codecs = { workspace = true }
+filmstar-project = { workspace = true }
+filmstar-edit = { workspace = true }
+filmstar-render = { workspace = true }
+filmstar-scopes = { workspace = true }
+filmstar-text = { workspace = true }
+filmstar-audio-dsp = { workspace = true }
+filmstar-export = { workspace = true }
+filmstar-mxf = { workspace = true }
+filmstar-format = { workspace = true }
+filmstar-interchange = { workspace = true }
+filmstar-captions = { workspace = true }
+filmstar-speech = { workspace = true }
+filmstar-tts = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+chrono = { workspace = true }
+craft-docpath = { workspace = true }
+web-time = "1"
+
+[dev-dependencies]
+filmstar-testkit = { workspace = true }
+filmstar-dng = { workspace = true, features = ["writer"] }
+filmstar-isobmff = { workspace = true }
+image = { version = "0.25", default-features = false, features = ["png", "gif"] }

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "filmstar": {
+      "command": "target/release/filmstar-cli",
+      "args": ["mcp", "--bridge", "127.0.0.1:9876"]
+    },
+    "filmstar-headless": {
+      "command": "target/release/filmstar-cli",
+      "args": ["mcp", "--demo"]
+    }
+  }
+}

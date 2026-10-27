@@ -1,0 +1,177 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "apps/*", "xtask"]
+default-members = ["crates/*", "apps/*", "xtask"]
+
+[workspace.package]
+version = "0.13.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/storytold/filmcraft"
+
+[workspace.dependencies]
+# internal
+filmstar-time = { path = "crates/time" }
+filmstar-geom = { path = "crates/geom" }
+filmstar-color = { path = "crates/color" }
+filmstar-bitstream = { path = "crates/bitstream" }
+filmstar-isobmff = { path = "crates/isobmff" }
+filmstar-avi = { path = "crates/avi" }
+filmstar-matroska = { path = "crates/matroska" }
+filmstar-mxf = { path = "crates/mxf" }
+filmstar-cfb = { path = "crates/cfb" }
+filmstar-mpegts = { path = "crates/mpegts" }
+filmstar-mpeg2v = { path = "crates/mpeg2v" }
+filmstar-ac3 = { path = "crates/ac3" }
+filmstar-mpa = { path = "crates/mpa" }
+filmstar-ogg = { path = "crates/ogg" }
+filmstar-h264 = { path = "crates/h264" }
+filmstar-hevc = { path = "crates/hevc" }
+filmstar-vp8 = { path = "crates/vp8" }
+filmstar-vp9 = { path = "crates/vp9" }
+filmstar-prores = { path = "crates/prores" }
+filmstar-dnx = { path = "crates/dnx" }
+filmstar-apv = { path = "crates/apv" }
+filmstar-dng = { path = "crates/dng" }
+filmstar-av1 = { path = "crates/av1" }
+filmstar-aac = { path = "crates/aac" }
+filmstar-flac = { path = "crates/flac" }
+filmstar-opus = { path = "crates/opus" }
+filmstar-h264enc = { path = "crates/h264enc" }
+filmstar-audio-dsp = { path = "crates/audio-dsp" }
+filmstar-frame = { path = "crates/frame" }
+filmstar-media = { path = "crates/media" }
+filmstar-codecs = { path = "crates/codecs" }
+filmstar-project = { path = "crates/project" }
+filmstar-edit = { path = "crates/edit" }
+filmstar-interchange = { path = "crates/interchange" }
+filmstar-text = { path = "crates/text" }
+filmstar-captions = { path = "crates/captions" }
+filmstar-speech = { path = "crates/speech" }
+filmstar-tts = { path = "crates/tts" }
+filmstar-tts-text = { path = "crates/tts-text" }
+filmstar-render = { path = "crates/render" }
+filmstar-gpu = { path = "crates/gpu" }
+filmstar-scopes = { path = "crates/scopes" }
+filmstar-export = { path = "crates/export" }
+filmstar-format = { path = "crates/format" }
+filmstar-engine = { path = "crates/engine" }
+filmstar-ui-egui = { path = "crates/ui-egui" }
+filmstar-automation = { path = "crates/automation" }
+filmstar-platform = { path = "crates/platform" }
+filmstar-testkit = { path = "crates/testkit" }
+
+# foundation
+thiserror = "2"
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = "1"
+log = "0.4"
+# All date/time conversion goes through chrono (no hand-rolled calendar code beyond the 400-year range extension; AGENTS.md).
+chrono = { version = "0.4.45", default-features = false, features = ["std"] }
+rayon = "1"
+proptest = "1"
+roxmltree = "0.21"
+craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "b926b5c03e256c86ca10934f58d03f628810b5b7" }
+craft-media = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "b926b5c03e256c86ca10934f58d03f628810b5b7", default-features = false }
+
+# ui
+# Shared frontend components; keep this dependency above the engine boundary.
+craft-ui = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "b926b5c03e256c86ca10934f58d03f628810b5b7", features = ["serde", "native-windows"] }
+# egui 0.37: bundled fonts are opt-in, and the monochrome symbol/emoji faces moved to their own
+# feature. FilmStar paints ✔ ✓ ✖ ⚡ ⚠ ⚙ ♪ ☑ in panel chrome, so both features are part of the
+# production font policy (system_fonts stays off).
+egui = { version = "0.37", features = ["default_fonts", "monochrome_emoji_fonts"] }
+eframe = { version = "0.37", default-features = false }
+egui_kittest = "0.37"
+craft-update = { git = "https://github.com/storytold/craft-libs", version = "=0.1.0", rev = "b926b5c03e256c86ca10934f58d03f628810b5b7", features = ["egui"] }
+rfd = "0.17"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+too_many_arguments = "allow"
+needless_range_loop = "allow"
+type_complexity = "allow"
+
+# Line tables keep file and line in panics and backtraces at a fraction of full debug info's size;
+# dependencies need none.
+[profile.dev.package."*"]
+opt-level = 2
+debug = false
+
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+
+# Codec hot loops: debug-build tests (RFC/oracle vectors) are minutes slower below opt-level 3.
+[profile.dev.package.filmstar-h264]
+opt-level = 3
+
+[profile.dev.package.filmstar-h264enc]
+opt-level = 3
+
+[profile.dev.package.filmstar-hevc]
+opt-level = 3
+
+[profile.dev.package.filmstar-prores]
+opt-level = 3
+
+[profile.dev.package.filmstar-dnx]
+opt-level = 3
+
+[profile.dev.package.filmstar-apv]
+opt-level = 3
+
+[profile.dev.package.filmstar-dng]
+opt-level = 3
+
+[profile.dev.package.filmstar-av1]
+opt-level = 3
+
+[profile.dev.package.filmstar-aac]
+opt-level = 3
+
+[profile.dev.package.filmstar-flac]
+opt-level = 3
+
+# Audio effects: realtime-factor tests and long convolution / spectral runs.
+[profile.dev.package.filmstar-audio-dsp]
+opt-level = 3
+
+[profile.dev.package.filmstar-mxf]
+opt-level = 3
+
+[profile.dev.package.filmstar-opus]
+opt-level = 3
+
+[profile.dev.package.filmstar-vp8]
+opt-level = 3
+
+[profile.dev.package.filmstar-vp9]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+# Keep the complete egui family and native event bridge on reviewed fork commits.
+[patch.crates-io]
+ecolor = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+emath = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+epaint = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+epaint_default_fonts = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui-winit = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui-wgpu = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_glow = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_extras = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_kittest = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_system_font_provider = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+eframe = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_demo_lib = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_inspection = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+winit = { git = "https://github.com/storytold/winit.git", rev = "a517b3846ee8457d84ee4975110bfda6797c44dc" }

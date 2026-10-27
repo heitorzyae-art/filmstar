@@ -1,0 +1,67 @@
+[package]
+name = "filmstar-ui-egui"
+description = "The FilmStar egui frontend (swappable): panels, docking, timeline, monitors, control channel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+craft-ui = { workspace = true }
+filmstar-time = { workspace = true }
+filmstar-geom = { workspace = true }
+filmstar-color = { workspace = true }
+filmstar-frame = { workspace = true }
+filmstar-media = { workspace = true }
+filmstar-project = { workspace = true }
+filmstar-tts = { workspace = true }
+filmstar-edit = { workspace = true }
+filmstar-render = { workspace = true }
+filmstar-text = { workspace = true }
+filmstar-audio-dsp = { workspace = true }
+filmstar-engine = { workspace = true }
+filmstar-export = { workspace = true }
+filmstar-gpu = { workspace = true }
+filmstar-scopes = { workspace = true }
+egui = { workspace = true }
+eframe = { workspace = true, features = ["default_fonts", "wgpu", "accesskit", "clipboard"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+rayon = { workspace = true }
+web-time = "1"
+# Unicode Bidirectional Algorithm for Arabic and Hebrew captions in reading order (MIT OR Apache-2.0).
+unicode-bidi = "0.3.18"
+# PNG decoding.
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+# Thread/process CPU clocks for frame-job profiling (safe wrappers; see frames.rs).
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", default-features = false, features = ["std", "time"] }
+# the same clocks on Windows (GetThreadTimes / GetProcessTimes behind a safe API; MIT OR Apache-2.0)
+[target.'cfg(windows)'.dependencies]
+cpu-time = "1"
+
+[dev-dependencies]
+pollster = "1"
+filmstar-codecs = { workspace = true }
+# the bench registers OS hardware decoders as the desktop app does (dev-dependency only: ui-egui
+# itself stays OS-independent and web-portable)
+filmstar-platform = { workspace = true }
+filmstar-interchange = { workspace = true }
+# A dependency's dev-dependencies do not propagate through egui_kittest: name the fonts this
+# test root needs explicitly so glyph and accessibility assertions run against the bundled faces.
+egui = { workspace = true, features = ["default_fonts", "monochrome_emoji_fonts"] }
+egui_kittest = { workspace = true, features = ["eframe", "wgpu"] }
+tempfile = "3"
+
+# build.rs bakes contributors/contributors.json into the binary (About ▸ Contributors).
+[build-dependencies]
+serde_json = { workspace = true }
+toml = "1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+craft-update = { workspace = true }
