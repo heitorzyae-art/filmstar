@@ -259,6 +259,17 @@ pub(super) fn defs() -> Vec<EffectDef> {
                 b("show", "Show Focus Area", false),
             ],
         ),
+        video(
+            "radial_blur",
+            "Radial Blur",
+            BLUR,
+            vec![
+                ch("type", "Type", &["Spin", "Zoom"], 0),
+                fs("amount", "Amount", 20.0, (0.0, 100.0), (0.0, 100.0), "", 1),
+                pt("center", "Center", f64::NAN, f64::NAN),
+                ch("quality", "Quality", &["Draft", "Good", "Best"], 1),
+            ],
+        ),
         video("reduce_interlace_flicker", "Reduce Interlace Flicker", BLUR, vec![fs("softness", "Softness", 0.0, (0.0, 10.0), (0.0, 10.0), "", 2)]),
         // ---- Color Correction ----
         video(
@@ -1122,6 +1133,7 @@ pub(super) fn apply_badges(v: &mut [EffectDef]) {
                 | "compound_blur"
                 | "directional_blur"
                 | "focus_blur"
+                | "radial_blur"
                 | "gaussian_blur"
                 | "asc_cdl"
                 | "lumetri"
@@ -1176,6 +1188,7 @@ mod tests {
                 "Directional Blur",
                 "Focus Blur",
                 "Gaussian Blur",
+                "Radial Blur",
                 "Reduce Interlace Flicker",
                 "Sharpen",
                 "Unsharp Mask",
@@ -1259,7 +1272,7 @@ mod tests {
                 n += 1;
             }
         }
-        assert_eq!(n, 93);
+        assert_eq!(n, 94);
         assert_eq!(CATALOGUE.len(), 16);
         // nothing else sits in the current folders
         for d in effect_defs().iter().filter(|d| d.kind == EffectKind::Video && d.category.first() == Some(&"Video Effects")) {

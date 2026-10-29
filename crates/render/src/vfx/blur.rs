@@ -188,6 +188,53 @@ pub fn focus(img: &mut Image, e: &EffectInstance, cx: &FxCtx) {
     }
 }
 
+/// Radial Blur: Spin smears the picture along circles around the centre point, Zoom along the
+/// rays through it. Each output pixel averages `taps` samples of the source, every one the pixel
+/// turned (Spin) or pulled towards the centre (Zoom) by a growing amount.
+pub fn radial(img: &mut Image, e: &EffectInstance, cx: &FxCtx) {
+    let amount = fv(e, "amount", cx).clamp(0.0, 100.0);
+    if amount < 0.05 || img.w == 0 || img.h == 0 {
+        return;
+    }
+    let zoom = chv(e, "type") == 1;
+    let taps = [16usize, 32, 64][chv(e, "quality").min(2) as usize];
+    let c = pv(e, "center", cx, img);
+    let (cxp, cyp) = (c.x as f32, c.y as f32);
+    // One (cos, sin, scale) per tap, applied to the pixel's offset from the centre. Spin sweeps
+    // 1.8 degrees per unit of Amount (100 = half a turn), centred on the pixel; Zoom pulls the
+    // sample up to 90 % of the way to the centre at Amount 100.
+    let ops: Vec<(f32, f32, f32)> = (0..taps)
+        .map(|k| {
+            let t = k as f32 / (taps - 1) as f32;
+            if zoom {
+                (1.0, 0.0, 1.0 - amount / 100.0 * 0.9 * t)
+            } else {
+                let a = ((t - 0.5) * amount * 1.8).to_radians();
+                (a.cos(), a.sin(), 1.0)
+            }
+        })
+        .collect();
+    let inv = 1.0 / taps as f32;
+    let src = img.clone();
+    let w = src.w;
+    img.px.par_chunks_mut(w * 4).enumerate().for_each(|(y, row)| {
+        for x in 0..w {
+            let (dx, dy) = (x as f32 + 0.5 - cxp, y as f32 + 0.5 - cyp);
+            let mut acc = [0f32; 4];
+            for &(co, si, sc) in &ops {
+                let (rx, ry) = ((dx * co - dy * si) * sc, (dx * si + dy * co) * sc);
+                let p = src.sample_bilinear_clamped(cxp + rx, cyp + ry);
+                for (a, v) in acc.iter_mut().zip(p) {
+                    *a += v;
+                }
+            }
+            for (o, a) in row[x * 4..x * 4 + 4].iter_mut().zip(acc) {
+                *o = a * inv;
+            }
+        }
+    });
+}
+
 /// Reduce Interlace Flicker: a vertical-only softening across fields.
 pub fn interlace_flicker(img: &mut Image, e: &EffectInstance, cx: &FxCtx) {
     let s = fv(e, "softness", cx) * cx.px_scale.max(0.25);

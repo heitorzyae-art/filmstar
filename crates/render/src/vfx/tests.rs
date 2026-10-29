@@ -66,6 +66,7 @@ const NEW_IDS: &[&str] = &[
     "channel_blur",
     "compound_blur",
     "focus_blur",
+    "radial_blur",
     "reduce_interlace_flicker",
     "asc_cdl",
     "video_limiter",
@@ -230,6 +231,7 @@ fn neutral_parameters_are_identity() {
         ("linear_wipe_legacy", vec![]),
         ("channel_blur", vec![]),
         ("bokeh_blur", vec![("amount", ParamValue::Float(0.0))]),
+        ("radial_blur", vec![("amount", ParamValue::Float(0.0))]),
         ("reduce_interlace_flicker", vec![]),
         ("vr_blur", vec![]),
         ("vr_sharpen", vec![]),
@@ -876,6 +878,35 @@ fn bokeh_and_focus_blur() {
     assert!(max_diff(&o, &pic) > 0.01);
     let (a, b) = (o.get(32, 32), pic.get(32, 32));
     assert!((0..4).all(|k| close(a[k], b[k], 1e-4)));
+}
+
+#[test]
+fn radial_blur_spins_and_zooms_around_the_centre() {
+    // A bright spot to the right of the centre of a black frame.
+    let mut img = solid(65, 65, [0.0, 0.0, 0.0]);
+    img.px[(32 * 65 + 50) * 4..(32 * 65 + 50) * 4 + 4].copy_from_slice(&[1.0, 1.0, 1.0, 1.0]);
+    // Spin smears it along the circle of radius ~18 around the centre (32, 32): up and down, not outwards.
+    let mut e = inst("radial_blur");
+    set(&mut e, "type", ParamValue::Choice(0));
+    set(&mut e, "quality", ParamValue::Choice(2));
+    setf(&mut e, "amount", 60.0);
+    let o = run("radial", &e, &img, &cx());
+    assert!(o.get(49, 40)[0] > 1e-4, "spin reaches the point's neighbours on the circle: {:?}", o.get(49, 40));
+    assert!(o.get(59, 32)[0] < 1e-6, "spin keeps the radius: {:?}", o.get(59, 32));
+    // Zoom smears it along the ray through the centre, outwards: pixels further out sample
+    // closer to the centre, so they pick the spot up; pixels nearer the centre or off the ray do not.
+    set(&mut e, "type", ParamValue::Choice(1));
+    let o = run("radial", &e, &img, &cx());
+    assert!(o.get(59, 32)[0] > 1e-4, "zoom reaches outwards along the ray: {:?}", o.get(59, 32));
+    assert!(o.get(42, 32)[0] < 1e-6, "zoom does not smear inwards: {:?}", o.get(42, 32));
+    assert!(o.get(50, 44)[0] < 1e-6, "zoom does not smear sideways: {:?}", o.get(50, 44));
+    // A flat picture stays flat under either mode.
+    let flat = solid(33, 33, [0.5, 0.5, 0.5]);
+    for kind in [0, 1] {
+        set(&mut e, "type", ParamValue::Choice(kind));
+        let o = run("radial", &e, &flat, &cx());
+        assert!(max_diff(&o, &flat) < 1e-5);
+    }
 }
 
 #[test]
